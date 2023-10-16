@@ -7,14 +7,18 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 
-const Header: React.FunctionComponent = () => {
+type Props = {
+  cameraPress: () => void;
+};
+
+const Header: React.FunctionComponent<Props> = ({ cameraPress }: Props) => {
   const iconSize = 20;
 
   return (
     <View style={styles.container}>
       <View style={styles.profilePicture}></View>
       <View style={styles.centerContainer}>
-        <TouchableOpacity style={styles.camera}>
+        <TouchableOpacity style={styles.camera} onPress={cameraPress}>
           <FontAwesome
             name="camera"
             size={iconSize}
