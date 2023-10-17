@@ -31,6 +31,7 @@ const App: React.FC = () => {
   const [showLoader, setShowLoader] = useState<boolean>(false);
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
 
+  // function to handle input state and also keep a word count
   const handleChange = (val: string) => {
     const words = val.split(" ");
     const newWordCount = words.length;
@@ -63,19 +64,23 @@ const App: React.FC = () => {
     }
   };
 
+  // function to select city
   const handleCityClick = (city: string) => {
     setSelectedCity(city);
     setModalVisible(false);
   };
 
+  // function to select feed category
   const handleFeedClick = (feed: string) => {
     setShowFeedCategory(false);
     setSelectedFeed(feed);
   };
 
+  // function for creating a post
   const onRocketPress = () => {
     setShowLoader(true);
     setSnackbarVisible(false);
+    // a simple timer to show loader
     setTimeout(() => {
       setShowLoader(false);
       setSnackbarVisible(true);
@@ -110,7 +115,6 @@ const App: React.FC = () => {
             />
             <Text style={{ textAlign: "right" }}>{wordCount + "/50"}</Text>
           </View>
-          {/** show selected images here */}
           <View style={styles.imagesContainer}>
             {images.length > 0 &&
               images.map((img, index) => (

@@ -1,12 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Modal,
-  Pressable,
-  TouchableOpacity,
-  Button,
-} from "react-native";
+import { StyleSheet, Text, View, Modal, TouchableOpacity } from "react-native";
 import React from "react";
 
 type Props = {

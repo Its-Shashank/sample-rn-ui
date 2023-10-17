@@ -9,10 +9,29 @@ import {
 } from "@expo/vector-icons";
 
 type Props = {
+  /**
+   *
+   * Prop for handling click event of camera icon
+   */
   cameraPress: () => void;
+  /**
+   *
+   * function for location icon click event
+   */
   locationPress: () => void;
+  /**
+   *
+   * function for handling list icon click event
+   */
   listPress: () => void;
+  /**
+   *
+   * function for handling rocket icon click event
+   */
   rocketPress: () => void;
+  /**
+   * flag that toggles rocket icon with loader
+   */
   showLoader: boolean;
 };
 
