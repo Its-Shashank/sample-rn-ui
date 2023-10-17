@@ -9,9 +9,13 @@ import {
 
 type Props = {
   cameraPress: () => void;
+  locationPress: () => void;
 };
 
-const Header: React.FunctionComponent<Props> = ({ cameraPress }: Props) => {
+const Header: React.FunctionComponent<Props> = ({
+  cameraPress,
+  locationPress,
+}: Props) => {
   const iconSize = 20;
 
   return (
@@ -26,7 +30,7 @@ const Header: React.FunctionComponent<Props> = ({ cameraPress }: Props) => {
             style={styles.iconStyle}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.location}>
+        <TouchableOpacity style={styles.location} onPress={locationPress}>
           <MaterialIcons
             name="location-on"
             size={iconSize}
@@ -39,7 +43,7 @@ const Header: React.FunctionComponent<Props> = ({ cameraPress }: Props) => {
             name="list"
             size={iconSize}
             color="black"
-            style={styles.iconStyle}
+            style={[styles.iconStyle, styles.reverseIcon]}
           />
         </TouchableOpacity>
       </View>
@@ -74,6 +78,9 @@ const styles = StyleSheet.create({
   },
   iconStyle: {
     padding: 10,
+  },
+  reverseIcon: {
+    transform: "scaleX(-1)",
   },
   camera: {},
   location: {},
