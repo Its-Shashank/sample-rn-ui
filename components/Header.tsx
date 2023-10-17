@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 import {
   FontAwesome,
   MaterialIcons,
@@ -10,17 +11,34 @@ import {
 type Props = {
   cameraPress: () => void;
   locationPress: () => void;
+  listPress: () => void;
+  rocketPress: () => void;
+  showLoader: boolean;
 };
 
-const Header: React.FunctionComponent<Props> = ({
+const Header: React.FC<Props> = ({
   cameraPress,
   locationPress,
+  listPress,
+  rocketPress,
+  showLoader,
 }: Props) => {
   const iconSize = 20;
 
   return (
     <View style={styles.container}>
-      <View style={styles.profilePicture}></View>
+      <View>
+        {!showLoader && (
+          <Image
+            style={styles.profilePicture}
+            source={{
+              uri: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?cs=srgb&dl=pexels-pixabay-220453.jpg&fm=jpg",
+            }}
+            height={50}
+            width={50}
+          />
+        )}
+      </View>
       <View style={styles.centerContainer}>
         <TouchableOpacity style={styles.camera} onPress={cameraPress}>
           <FontAwesome
@@ -38,7 +56,7 @@ const Header: React.FunctionComponent<Props> = ({
             style={styles.iconStyle}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={listPress}>
           <FontAwesome5
             name="list"
             size={iconSize}
@@ -47,8 +65,16 @@ const Header: React.FunctionComponent<Props> = ({
           />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity>
-        <MaterialCommunityIcons name="rocket-launch" size={28} color="black" />
+      <TouchableOpacity onPress={rocketPress}>
+        {showLoader ? (
+          <ActivityIndicator size="small" color="#0000ff" />
+        ) : (
+          <MaterialCommunityIcons
+            name="rocket-launch"
+            size={28}
+            color="black"
+          />
+        )}
       </TouchableOpacity>
     </View>
   );

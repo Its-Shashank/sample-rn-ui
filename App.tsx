@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   Image,
   View,
@@ -8,33 +7,45 @@ import {
   TextInput,
   Text,
   Platform,
-  Modal,
-  Alert,
-  Button,
-  TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { PaperProvider } from "react-native-paper";
+import { Snackbar } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome } from "@expo/vector-icons";
 import Header from "./components/Header";
-import CityDisplay from "./components/CityDisplay";
+import CityModal from "./components/CityModal";
+import FeedCategoryModal from "./components/FeedCategoryModal";
+import SelectedItemCard from "./components/SelectedItemCard";
 
-const App: React.FunctionComponent = () => {
+const App: React.FC = () => {
   const [openCamera, setOpenCamera] = useState<boolean>(false);
   const [images, setImages] = useState<string[]>([]);
-  const [charCount, setCharCount] = useState<number>(0);
+  const [wordCount, setWordCount] = useState<number>(0);
   const [input, setInput] = useState<string>("");
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedCity, setSelectedCity] = useState<string>("");
+  const [showFeedCategory, setShowFeedCategory] = useState<boolean>(false);
+  const [selectedFeed, setSelectedFeed] = useState<string>("");
+  const [showLoader, setShowLoader] = useState<boolean>(false);
+  const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
 
   const handleChange = (val: string) => {
-    if (val.length <= 50) {
-      setInput(val);
-      setCharCount(val.length);
+    const words = val.split(" ");
+    const newWordCount = words.length;
+
+    if (val.trim() === "") {
+      setWordCount(0);
+    } else {
+      setWordCount(newWordCount);
     }
+    setInput(val);
   };
 
   const showCameraIcon = () => setOpenCamera(true);
+
+  const openFeedCategory = () => setShowFeedCategory(true);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -44,8 +55,6 @@ const App: React.FunctionComponent = () => {
       aspect: [1, 1],
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       const imgs = [...images, result.assets[0].uri];
@@ -59,84 +68,96 @@ const App: React.FunctionComponent = () => {
     setModalVisible(false);
   };
 
+  const handleFeedClick = (feed: string) => {
+    setShowFeedCategory(false);
+    setSelectedFeed(feed);
+  };
+
+  const onRocketPress = () => {
+    setShowLoader(true);
+    setSnackbarVisible(false);
+    setTimeout(() => {
+      setShowLoader(false);
+      setSnackbarVisible(true);
+      setSelectedCity("");
+      setSelectedFeed("");
+      setInput("");
+      setImages([]);
+    }, 5000);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <StatusBar style="auto" /> */}
-      <View
-        style={{
-          paddingVertical: 20,
-          paddingHorizontal: 24,
-        }}>
-        <Header
-          cameraPress={showCameraIcon}
-          locationPress={() => setModalVisible(true)}
-        />
-        <View style={styles.inputContainer}>
-          <TextInput
-            onChangeText={handleChange}
-            value={input}
-            placeholder="Type here..."
+    <PaperProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="auto" />
+        <View
+          style={{
+            paddingVertical: 20,
+            paddingHorizontal: 24,
+          }}>
+          <Header
+            cameraPress={showCameraIcon}
+            locationPress={() => setModalVisible(true)}
+            listPress={openFeedCategory}
+            rocketPress={onRocketPress}
+            showLoader={showLoader}
           />
-          <Text style={{ textAlign: "right" }}>{charCount + "/50"}</Text>
-        </View>
-        {/** show selected images here */}
-        <View style={styles.imagesContainer}>
-          {images.length > 0 &&
-            images.map((img, index) => (
-              <Image
-                key={index}
-                source={{ uri: img }}
-                style={{ borderRadius: 8 }}
-                height={80}
-                width={80}
-              />
-            ))}
-          {openCamera && (
-            <Pressable style={styles.camera} onPress={pickImage}>
-              <FontAwesome name="camera" size={30} color="black" />
-            </Pressable>
-          )}
-        </View>
-        {selectedCity && <CityDisplay cityName={selectedCity} />}
-      </View>
-      <Modal
-        visible={modalVisible}
-        collapsable
-        transparent
-        animationType="slide"
-        onDismiss={() => setModalVisible(false)}
-        onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.locationModal}>
-          <View style={styles.modalView}>
-            <Pressable onPress={() => setModalVisible(false)}>
-              <Text style={{ textAlign: "center" }}>Close</Text>
-            </Pressable>
-            <View
-              style={{
-                height: 48,
-                backgroundColor: "white",
-                borderRadius: 24,
-                marginVertical: 20,
-              }}></View>
-            <View>
-              <TouchableOpacity
-                onPress={() => handleCityClick("Melbourne")}
-                style={{ marginBottom: 8 }}>
-                <Text>Melbourne</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleCityClick("Sydney")}
-                style={{ marginBottom: 8 }}>
-                <Text>Sydney</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleCityClick("Brisbane")}>
-                <Text>Brisbane</Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              onChangeText={handleChange}
+              value={input}
+              placeholder="Type here..."
+            />
+            <Text style={{ textAlign: "right" }}>{wordCount + "/50"}</Text>
           </View>
+          {/** show selected images here */}
+          <View style={styles.imagesContainer}>
+            {images.length > 0 &&
+              images.map((img, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: img }}
+                  style={{ borderRadius: 8 }}
+                  height={80}
+                  width={80}
+                />
+              ))}
+            {openCamera && (
+              <Pressable style={styles.camera} onPress={pickImage}>
+                <FontAwesome name="camera" size={30} color="black" />
+              </Pressable>
+            )}
+          </View>
+          <View style={{ marginBottom: 10 }}>
+            {selectedCity && (
+              <SelectedItemCard name={selectedCity} showLocationIcon />
+            )}
+          </View>
+          {selectedFeed && <SelectedItemCard name={selectedFeed} />}
         </View>
-      </Modal>
-    </SafeAreaView>
+        <CityModal
+          modalVisible={modalVisible}
+          handleCityClick={handleCityClick}
+          onDismiss={() => setModalVisible(false)}
+        />
+        <FeedCategoryModal
+          modalVisible={showFeedCategory}
+          handleFeedClick={handleFeedClick}
+          onDismiss={() => setShowFeedCategory(false)}
+        />
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          action={{
+            label: "Dismiss",
+            onPress: () => {
+              // Handle action press (if needed)
+            },
+          }}>
+          Yay! Your post has been created!
+        </Snackbar>
+      </SafeAreaView>
+    </PaperProvider>
   );
 };
 
@@ -155,6 +176,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
+    marginBottom: 10,
     gap: 10,
   },
   camera: {
@@ -165,25 +187,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 8,
     backgroundColor: "#f7f5f5",
-  },
-  locationModal: {
-    flex: 1,
-    justifyContent: "flex-end",
-    // alignItems: "center",
-  },
-  modalView: {
-    maxHeight: 500,
-    minHeight: 400,
-    backgroundColor: "#e3e1e1",
-    borderRadius: 20,
-    padding: 20,
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
-    // elevation: 5,
   },
 });
